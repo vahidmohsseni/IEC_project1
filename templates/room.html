@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>room</title>
+        <h2>Room</h2>
+        <br><br>
+    </head>
+
+    <body>
+        <span>
+            <span>
+                <span>add user from contacts</span><br>
+                {% for contact in contacts %}
+                    <span><a href="/add_to_room/{{ room }}/{{ contact }}">{{ contact }}</a></span>
+                    <br>
+                {% endfor %}
+            </span>
+            <br><br>
+
+            <span>
+                <span>users in room:</span><br>
+                {% for room_user in room_users %}
+                    <span>{{ room_user.users.username }}</span>
+                    <br>
+                {% endfor %}
+            </span>
+        </span>
+    </body>
+</html>

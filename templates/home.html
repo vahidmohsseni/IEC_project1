@@ -1,13 +1,56 @@
 <html>
     <head>
         <title>skypetor!</title>
-        <h2>welcome to skypetor!</h2>
-        <br><br><br><br>
+        <h2>welcome to skypetor {{ username }}!</h2>
+        <br>
     </head>
     <body>
-        <form action="/search_user" method="GET">
-            <input type="text" name="username">
-            <input type="submit">
+        <form action="/logout">
+            <input type="submit" value="LOGOUT">
         </form>
+        <br> <br>
+        <span>
+            <span>search for users:</span> <br>
+            <form action="/search_user" method="GET">
+                <input type="text" name="username">
+                <input type="submit">
+            </form>
+        </span>
+
+        <!-- <span>
+            <span>Rooms:</span>
+            <form action="/create_room" method="POST">
+                <input type="text" name="room_name">
+                <input type="submit" title="create room" value="Create" >
+            </form>
+            <br>
+
+            {% for room in rooms %}
+                <span >{{ room.room.name }} <a href="/room/{{ room.room.id }}">go!</a></span>
+                <br><br>
+            {% endfor %}
+
+        </span> -->
+
+        <span>
+            <span>room:</span>
+            <!-- make following forms works with xhr -->
+            <span>
+                <form action="/create_room/wait" method="POST" >
+                    <input name='room_name' type="text">
+                    <input type="submit" value="Create">
+                </form>
+            </span>
+            <br>
+            <span>join to room:</span>
+            <span>
+                <form action="/join" method="POST">
+                    <input type="text" name="room_id">
+                    <input type="submit">
+
+                </form>
+            </span>
+        </span>
+
     </body>
 </html>

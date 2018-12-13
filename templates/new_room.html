@@ -1,0 +1,29 @@
+<html>
+        <head>
+            <title>room</title>
+            <h2>Room</h2>
+            <br><br>
+        </head>
+
+
+        <body>
+            <span>Room ID: </span>
+            <span>{{ room.id }}</span><br>
+            <span>share room id above with your firends to join!</span>
+
+            <div id="event"></div>
+            <script type="text/javascript">
+
+            var eventOutputContainer = document.getElementById("event");
+            // test
+            // var evtSrc = new EventSource("/subscribe"); 
+            var evtSrc = new EventSource("/listen_to_room/{{ room.id }}");
+
+            evtSrc.onmessage = function(e) {
+                console.log(e.data);
+                eventOutputContainer.innerHTML = e.data;
+            };
+
+            </script>
+        </body>
+</html>    

@@ -1,4 +1,4 @@
-from sqlobject import StringCol, SQLObject, ForeignKey, sqlhub, connectionForURI, UnicodeCol
+from sqlobject import StringCol, SQLObject, ForeignKey, sqlhub, connectionForURI, UnicodeCol, IntCol
 from config import DB_DIR
 
 sqlhub.processConnection = connectionForURI("sqlite:" + DB_DIR)
@@ -8,10 +8,12 @@ class User(SQLObject):
     username = UnicodeCol()
     email = UnicodeCol()
     password = UnicodeCol()
-    
+
 
 class Room(SQLObject):
     admin = ForeignKey('User')
+    name = UnicodeCol()
+    numbers = IntCol()
 
 class RoomUsers(SQLObject):
     room = ForeignKey('Room')

@@ -79,3 +79,94 @@ def add_contacts(username, contact):
     except Exception as e:
         print(e)
         return "failed"
+
+
+def get_contacts_by_username(username):
+    try:
+        user = User.select(User.q.username == username).getOne()
+        user_contacts = UserContacts.select(UserContacts.q.user == user)
+        result = []
+        for i in user_contacts:
+            result.append(i.con_user.username)
+        
+        return result
+    except Exception as e:
+        print(e)
+        return []
+
+def create_room(username, room_name):
+    try:
+        user = User.select(User.q.username == username).getOne()
+        room = Room(admin=user, name=room_name, numbers=1)
+        RoomUsers(room=room, users=user)
+
+        return 'ok', room
+    except Exception as e:
+        print(e)
+        return "failed", None
+
+
+def get_rooms(username):
+    try:
+        
+        user = User.select(User.q.username == username).getOne()
+        room_users = RoomUsers.select(RoomUsers.q.users == user)
+
+        result = list(room_users)
+        return result
+
+    except Exception as e:
+        print(e)
+        return []
+
+def get_room_by_id(room_id):
+    try: 
+        room = Room.select(Room.q.id == room_id).getOne()
+        return room
+    except Exception as e:
+        print(e)
+        return 'failed'
+
+
+def check_user_in_room(username, room_id):
+    try:
+        user = User.select(User.q.username == username).getOne()
+        room = Room.select(Room.q.id == room_id).getOne()
+        RoomUsers.select(AND(RoomUsers.q.users == user, RoomUsers.q.room == room)).getOne()
+        
+        return 'ok'
+
+    except Exception as e:
+        print(e)
+        return 404
+    
+
+def get_contacts_of_room(room_id):
+    try:
+        room = Room.select(Room.q.id == room_id).getOne()
+        room_users = RoomUsers.select(RoomUsers.q.room == room)
+        # for i in room_users:
+            # print(i)
+        return list(room_users)
+
+    except Exception as e:
+        print(e)
+        return []
+
+
+def add_to_room(room_id, username):
+    try:
+        if check_user_in_room(username, room_id) == 'ok':
+            
+            return 'already'
+
+        room = Room.select(Room.q.id == room_id).getOne()
+        user = User.select(User.q.username == username).getOne()
+
+        RoomUsers(room=room, users=user)
+
+        return 'ok'
+
+    except Exception as e:
+        print(e)
+        return 'failed'

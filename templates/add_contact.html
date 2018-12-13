@@ -1,14 +1,15 @@
 
 <html>
-        <head>
-            <title>add contact!</title>
-            <h2>search result:</h2>
-            <br><br><br><br>
-        </head>
-        <body>
-            {% for user in users %}
-                <span >{{ user }} <a href="/add_con/{{ user }}">add</a></span>
-                <br><br>
-            {% endfor %}
-        </body>
-    </html>
+    <head>
+        <title>add contact!</title>
+        <h2>search result:</h2>
+        <br><br><br><br>
+    </head>
+    <body>
+        <span>select  from below:</span><br><br><br>
+        {% for user in users %}
+            <span >{{ user }} <a href="/add_con/{{ user }}">add</a></span>
+            <br><br>
+        {% endfor %}
+    </body>
+</html>
