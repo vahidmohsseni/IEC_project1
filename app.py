@@ -37,7 +37,7 @@ ServerRooms = {}
 @app.route("/")
 def home():
     if 'username' not in session:
-        return render_template("login.html")
+        return render_template("new_login.html")
     
     # contacts = transactions.get_contacts(session['username'])
     rooms = transactions.get_rooms(session['username'])
