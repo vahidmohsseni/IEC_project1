@@ -1,5 +1,8 @@
 from flask import Flask, session, render_template, redirect, url_for, request, Response, jsonify
-from config import SECRET
+from flask_socketio import SocketIO, emit
+from flask_socketio import join_room as join_room_online
+from flask_socketio import close_room as close_room_online
+from config import SECRET, CONNECTION_EXPIRE_TIME
 import gevent
 from gevent.pywsgi import WSGIServer
 from gevent.queue import Queue
@@ -34,7 +37,9 @@ app.secret_key = SECRET
 subscriptions = []
 
 ServerRooms = {}
+socket_io = SocketIO(app)
 
+online_users = {}
 
 @app.route("/old_login")
 def test():
@@ -319,6 +324,91 @@ def test_sse_subscribe():
 
     return Response(gen(), mimetype="text/event-stream")
 
+@app.route("/websocket")
+def temp_api():
+    return render_template('websocket_temp.html')
+
+
+@socket_io.on('message')
+def handle_incomming_message(message):
+    print('Receive message: ', message)
+
+
+@socket_io.on('my_ping', namespace='/ws')
+def ping_pong():
+    emit('my_pong')
+
+
+@socket_io.on('connect', namespace='/ws')
+def on_connection():
+    if 'username' in session:
+        contacts = transactions.get_contacts_by_username(session['username'])
+        join_room_online(session['username'])
+        online_users[session['username']] = [time.time(), CONNECTION_EXPIRE_TIME, contacts]
+        temp = []
+        for con in contacts:
+            if con in online_users:
+                temp.append(con)
+        
+        emit('on_con_resp', {'response': 'online_contacts', 
+                            'online_contacts': temp})
+        
+        # send a message to corresponding user's contacts
+        for user in online_users:
+            if session['username'] in online_users[user][2]:
+                temp = []
+                for con in online_users[user][2]:
+                    if con in online_users:
+                        temp.append(con)
+
+                emit('on_con_resp', {'response': 'online_contacts',
+                                    'online_contacts': temp}, room=user)
+
+    print('receive a connection')
+
+
+@socket_io.on('disconnect', namespace='/ws')
+def on_disconnection():
+    if 'username' in session:
+        online_users.pop(session['username'], False)
+        close_room_online(session['username'])
+
+        # send a message to corresponding user's contacts
+        for user in online_users:
+            if session['username'] in online_users[user][2]:
+                temp = []
+                for con in online_users[user][2]:
+                    if con in online_users:
+                        temp.append(con)
+                emit('on_con_resp', {'response': 'online_contacts',
+                                    'online_contacts': temp}, room=user)
+
+        print("session: %s disconnected!" % session['username'])
+    print('clinet disconnected')
+
+
+@socket_io.on("chat", namespace='/ws')
+def on_chat(message):
+    if 'username' in session:
+        room = message['user_id']
+        message = message['message']
+
+        emit('on_new_mess', {'response': 'new_message',
+                            'from': session['username'], 
+                            'message': message}, room=room)
+
+
+def background_task():
+    while True:
+        to_be_deleted = []
+        for user in online_users:
+            online_users[user][0] += 1
+            flag = online_users[user][0] >= CONNECTION_EXPIRE_TIME
+            if flag:
+                to_be_deleted.append(user)
+                # send to other contacts that user is offline
+        time.sleep(1)
+
 
 @werkzeug.serving.run_with_reloader
 def run_server():
@@ -326,7 +416,14 @@ def run_server():
     server = WSGIServer(("0.0.0.0", 5000), app)
     server.serve_forever()
 
+@werkzeug.serving.run_with_reloader
+def run_with_socketio():
+    socket_io.debug = True
+    server = WSGIServer(("0.0.0.0", 5000), socket_io)
+    server.serve_forever()
+
 
 if __name__ == "__main__":
-    run_server()
+    # run_server()
+    run_with_socketio()
     # app.run()
