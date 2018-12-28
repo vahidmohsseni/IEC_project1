@@ -5,9 +5,9 @@
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
-    <!-- <link type="text/css" rel="stylesheet" href="static/css/materialize.css" media="screen,projection" /> -->
+    <link type="text/css" rel="stylesheet" href="/static/css/materialize.css" media="screen,projection"/>
 
-    <link type="text/css" rel="stylesheet" href="static/css/global_style.css" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="/static/css/global_style.css" media="screen,projection"/>
 
 
     <!--Let browser know website is optimized for mobile-->
@@ -17,13 +17,13 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Unlock" rel="stylesheet">
 
     <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">#}
 
     <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    {#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">#}
 
     <!-- Compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>#}
 
 
 </head>
@@ -32,17 +32,45 @@
     <ul id="dropdown1" class="dropdown-content">
         <li><a href="/logout">Logout</a></li>
     </ul>
-    <nav class="col l6 offset-l3 m6 offset-m3 s12 cyan darken-2 ">
+    <nav class="col xl6 offset-xl3 l6 offset-l3 m8 offset-m2 s12 cyan darken-2 ">
         <div class="nav-wrapper">
             <a href="#" class="brand-logo">Skypetor</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a class="dropdown-button" href="#!" data-activates="dropdown1">{{ username }}<i
+                <li><a class="dropdown-trigger" href="#" data-target="dropdown1">{{ username }}<i
                         class="material-icons right">arrow_drop_down</i></a></li>
-
             </ul>
         </div>
     </nav>
-    <ul class="collapsible col l6 offset-l3 m6 offset-m3 s12">
+</div>
+<div class="row">
+    <div class="col l3 m3 hide-on-small-and-down " name="chatbox">
+        <ul class="collection">
+            <li class="collection-item avatar">
+                <img src="/static/img_avatar2.png" alt="" class="circle">
+                <span class="title">Title</span>
+                <p>
+                </p>
+            </li>
+            <li class="collection-item grey lighten-2">
+                <div class="chip cyan darken-2 white-text text">salam</div>
+                <br>
+                <div class="chip white cyan-text text-darken-2 right">salam</div>
+                <br>
+            </li>
+            <li class="collection-item ">
+                <div class="input-field col s12 m8 l8 xl8">
+                    <input type="text" name="msg">
+                    <label for="msg">type message</label>
+                </div>
+                <div class="input-field col s12 m4 l4 xl4">
+                    <br>
+                            <button class='waves-effect waves-light btn-small s12' type="submit">Send</button>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+    <ul class="collapsible col l6  m6  s12">
         <li>
             <div class="collapsible-header"><i class="material-icons">search</i>Search for user</div>
             <div class="collapsible-body">
@@ -95,15 +123,72 @@
             </div>
         </li>
     </ul>
+    <div class="col l3 m3 hide-on-small-and-down">
+        <div class="card">
+            <div class="card-title  center-align cyan darken-2 white-text">Contact</div>
+            <div class="card-content">
+                <ul class="collapsible expandable">
+                    <li class="active">
+                        <div class="collapsible-header"><i class="material-icons green-text text-darken-2">lens</i>Online
+                        </div>
+                        <div class="collapsible-body">
+                            <ul class="collection">
+                                {% for contact in contacts %}
+                                    {% if contact.status %}
+                                        <li class="collection-item avatar">
+                                            <img src="/static/img_avatar2.png" alt="" class="circle">
+                                            <span class="title">{{ contact.user.username }}</span>
+                                            <p>{{ contact.user.email }}<br>{{ loop.index }}</p>
+                                            <a href="#!" class="secondary-content"><i
+                                                    class="material-icons">send</i></a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="active">
+                        <div class="collapsible-header"><i class="material-icons red-text text-darken-2">lens</i>Offline
+                        </div>
+                        <div class="collapsible-body">
+                            <ul class="collection">
+                                {% for contact in contacts %}
+                                    {% if not contact.status %}
+                                        <li class="collection-item avatar">
+                                            <img src="/static/img_avatar2.png" alt="" class="circle">
+                                            <span class="title">{{ contact.user.username }}</span>
+                                            <p>{{ contact.user.email }}</p>
+                                            <a href="#!" class="secondary-content"><i
+                                                    class="material-icons">send</i></a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!--JavaScript at end of body for optimized loading-->
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<!-- <script type="text/javascript" src="static/js/materialize.min.js"></script> -->
+<script type="text/javascript" src="/static/js/materialize.js"></script>
 
 <!-- Compiled and minified JavaScript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>#}
+<!-- Compiled and minified JavaScript -->
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.js"></script>#}
+<script>
+    M.AutoInit();
+    var elem = document.querySelector('.collapsible.expandable');
+    var instance = M.Collapsible.init(elem, {
+        accordion: false
+    });
 
+    {#$('.dropdown-trigger').dropdown();#}
+</script>
 
 </body>
 
