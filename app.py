@@ -51,11 +51,13 @@ def home():
     if 'username' not in session:
         return render_template("new_login.html")
 
-    # contacts = transactions.get_contacts(session['username'])
+    contacts = transactions.get_contacts_by_username(session['username'])
+    print(contacts)
+    # contacts[1]['status']=False
     rooms = transactions.get_rooms(session['username'])
 
     # rooms = []
-    return render_template("new_home.html", username=session['username'], rooms=rooms)
+    return render_template("new_home.html", username=session['username'], rooms=rooms,contacts=contacts)
 
 
 @app.route('/signup')
@@ -181,7 +183,7 @@ def room(room_id):
 
     contacts = transactions.get_contacts_by_username(username)
 
-    for i in contacts:
+    for ـ in contacts:
         pass
 
     return render_template('room.html', contacts=contacts, room=room_id, room_users=room_users)
@@ -193,7 +195,7 @@ def add_to_room(room_id, username):
     if 'username' not in session:
         return redirect(url_for('home'))
 
-    stat = transactions.add_to_room(room_id, username)
+    state = transactions.add_to_room(room_id, username)
 
     return redirect(url_for('room', room_id=room_id))
 
@@ -203,8 +205,8 @@ def render_new_room(room_name):
     if 'username' not in session:
         return redirect(url_for('home'))
 
-    stat, room = transactions.create_room(session['username'], room_name)
-    if stat == 'ok':
+    state, room = transactions.create_room(session['username'], room_name)
+    if state == 'ok':
         return render_template('new_room.html', room=room)
     return 'failed'
 
@@ -217,7 +219,8 @@ def render_new_room_form():
     if 'room_name' not in request.form:
         return 'invalid input'
 
-    stat, room = transactions.create_room(session['username'], request.form['room_name'])
+    stat, room = transactions.create_room(
+        session['username'], request.form['room_name'])
     if stat == 'ok':
         return render_template('new_room.html', room=room)
     return 'failed'
