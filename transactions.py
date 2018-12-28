@@ -87,7 +87,9 @@ def get_contacts_by_username(username):
         user_contacts = UserContacts.select(UserContacts.q.user == user)
         result = []
         for i in user_contacts:
-            result.append(i.con_user.username)
+            temp = {"status":True}
+            temp['user']=i.con_user
+            result.append(temp)
         
         return result
     except Exception as e:
