@@ -134,15 +134,15 @@
                         <div class="collapsible-body">
                             <ul class="collection">
                                 {% for contact in contacts %}
-                                    {% if contact.status %}
+                                    
                                         <li class="collection-item avatar">
                                             <img src="/static/img_avatar2.png" alt="" class="circle">
-                                            <span class="title">{{ contact.user.username }}</span>
-                                            <p>{{ contact.user.email }}<br>{{ loop.index }}</p>
+                                            <span class="title">{{ contact }}</span>
+                                            <p></p>
                                             <a href="#!" class="secondary-content"><i
                                                     class="material-icons">send</i></a>
                                         </li>
-                                    {% endif %}
+                                    
                                 {% endfor %}
                             </ul>
                         </div>
@@ -153,11 +153,11 @@
                         <div class="collapsible-body">
                             <ul class="collection">
                                 {% for contact in contacts %}
-                                    {% if not contact.status %}
+                                    {% if false %}
                                         <li class="collection-item avatar">
                                             <img src="/static/img_avatar2.png" alt="" class="circle">
-                                            <span class="title">{{ contact.user.username }}</span>
-                                            <p>{{ contact.user.email }}</p>
+                                            <span class="title">{{ contact }}</span>
+                                            <p></p>
                                             <a href="#!" class="secondary-content"><i
                                                     class="material-icons">send</i></a>
                                         </li>
