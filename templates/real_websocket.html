@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" charset="utf-8">
+       var ws = new WebSocket("ws://127.0.0.1:5000/connect");
+       ws.onopen = function() {
+           ws.send(JSON.stringify({type: "echo", payload: "hi!"}));
+       };
+       ws.onclose = function(evt) {
+           alert("socket closed");
+       };
+       ws.onmessage = function(evt) {
+           alert(evt.data);
+       };
+
+       function send_mess(event){
+                ws.send(JSON.stringify({type: "chat", payload: {user_id: document.querySelector('#user_id').value,
+                                                                message: document.querySelector('#message').value}}));
+                // ws.send('chat', {user_id: $('#user_id').val(), message: $('#message').val()});
+                return false;
+            };
+       
+    </script>
+  </head>
+
+
+  <body>
+    <h1>Flask-Sockets Test</h1>
+    <h2>Send:</h2>
+
+    <div><span>chat</span></div>
+    <form id="chat" method="POST">
+        <span>
+            <span>user_id: </span>
+            <input type="text" id="user_id" name="user_id">
+        </span>
+        <span>
+            <span>message: </span>
+            <input type="text" id="message" name="message">
+        </span>
+        <input type="button" value="Send" onclick="send_mess()">
+    </form>
+
+    <h2>Receive:</h2>
+    <div id="log"></div>
+</body>
+</html>
+</html>
