@@ -2,6 +2,7 @@ from flask import Flask, session, render_template, redirect, url_for, request, R
 from flask_socketio import SocketIO, emit
 from flask_socketio import join_room as join_room_online
 from flask_socketio import close_room as close_room_online
+from flask_sockets import Sockets
 from config import SECRET, CONNECTION_EXPIRE_TIME
 import gevent
 from gevent.pywsgi import WSGIServer
@@ -38,6 +39,8 @@ subscriptions = []
 
 ServerRooms = {}
 socket_io = SocketIO(app)
+
+sockets = Sockets(app)
 
 online_users = {}
 
@@ -401,6 +404,55 @@ def on_chat(message):
                             'message': message}, room=room)
 
 
+@sockets.route('/connect')
+def echo_socket(ws):
+    print(session)
+    if 'username' in session:
+        print("salam!!!")
+        contacts = transactions.get_contacts_by_username(session['username'])
+        online_users[session['username']] = [time.time(), CONNECTION_EXPIRE_TIME, contacts, ws]
+        temp = []
+        print(contacts)
+        print(online_users)
+        for con in contacts:
+            if con in online_users:
+                temp.append(con)
+        
+        ws.send(json.dumps({"status": "ok", 'online_users': temp}))
+
+    while True:
+        message = ws.receive()
+        try:
+            message = json.loads(message)
+        except:
+            print(message)
+            continue
+            
+
+        
+        msg_type = message["type"]
+
+
+        if msg_type == 'echo':
+            ws.send(message['payload'])
+
+        elif msg_type == 'chat':
+            payload = message['payload']
+            print(online_users)
+            ws_temp = online_users.get(payload['user_id'], [1, 2, 3, False])[3]
+            if not ws_temp :
+                ws.send("khaye karde")
+            else:
+                ws_temp.send("madar vesal")
+        
+        print(message)
+
+
+@app.route("/sockets")
+def render_sockets():
+    return render_template('real_websocket.html')
+
+
 def background_task():
     while True:
         to_be_deleted = []
@@ -416,7 +468,8 @@ def background_task():
 @werkzeug.serving.run_with_reloader
 def run_server():
     app.debug = True
-    server = WSGIServer(("0.0.0.0", 5000), app)
+    from geventwebsocket.handler import WebSocketHandler
+    server = WSGIServer(("0.0.0.0", 5000), app,  handler_class=WebSocketHandler)
     server.serve_forever()
 
 @werkzeug.serving.run_with_reloader
