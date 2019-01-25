@@ -41,10 +41,11 @@
             </ul>
         </div>
     </nav>
+    <input id="user_id" value="salam" hidden>
 </div>
-<div class="row hide-on-med-and-down">
-    <div class="col l3 hide-on-med-and-down " name="chatbox">
-        <ul class="collection">
+<div class="row hide-on-med-and-down" name="large_row">
+    <div class="col l3 " name="chatbox">
+        <ul class="collection hide" name="collection_chatbox">
             <li class="collection-item avatar">
                 <img src="/static/img_avatar2.png" alt="" class="circle">
                 <span class="title">Title</span>
@@ -122,6 +123,45 @@
                 </div>
             </div>
         </li>
+        <li>
+            <div class="collapsible-header"><i class="material-icons">contacts</i>Contact</div>
+            <div class="collapsible-body" >
+                <div class="row">
+                    <div class="card">
+                        <div class="card-title  center-align cyan darken-2 white-text">Contact</div>
+                        <div class="card-content" style="height: 50vh;overflow: scroll">
+                            <ul class="collapsible expandable">
+                                <li class="active">
+                                    <div class="collapsible-header"><i class="material-icons green-text text-darken-2">lens</i>Online
+                                    </div>
+                                    <div class="collapsible-body">
+                                        <ul class="collection" id="online_contact_list">
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="active">
+                                    <div class="collapsible-header"><i class="material-icons red-text text-darken-2">lens</i>Offline
+                                    </div>
+                                    <div class="collapsible-body">
+                                        <ul class="collection">
+                                            {% for contact in contacts %}
+                                                <li class="collection-item avatar" id="{{ contact }}">
+                                                    <img src="/static/img_avatar2.png" alt="" class="circle">
+                                                    <span class="title">{{ contact }}</span>
+                                                    <br>
+                                                    <a href="#!" class="" onclick="send_click()"><i
+                                                            class="material-icons">send</i></a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
     </ul>
     <div class="col l3 hide-on-med-and-down">
         <div class="card">
@@ -132,18 +172,7 @@
                         <div class="collapsible-header"><i class="material-icons green-text text-darken-2">lens</i>Online
                         </div>
                         <div class="collapsible-body">
-                            <ul class="collection">
-                                {% for contact in contacts %}
-                                    {% if True %}
-                                        <li class="collection-item avatar">
-                                            <img src="/static/img_avatar2.png" alt="" class="circle">
-                                            <span class="title">username</span>
-                                            <p>email<br>loop index</p>
-                                            <a href="#!" class="secondary-content" onclick="send_click()"><i
-                                                    class="material-icons">send</i></a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
+                            <ul class="collection" id="online_contact_list">
                             </ul>
                         </div>
                     </li>
@@ -153,15 +182,13 @@
                         <div class="collapsible-body">
                             <ul class="collection">
                                 {% for contact in contacts %}
-                                    {% if False %}
-                                        <li class="collection-item avatar">
-                                            <img src="/static/img_avatar2.png" alt="" class="circle">
-                                            <span class="title">{{ contact.user.username }}</span>
-                                            <p>{{ contact.user.email }}</p>
-                                            <a href="#!" class="secondary-content" onclick="send_click()"><i
-                                                    class="material-icons">send</i></a>
-                                        </li>
-                                    {% endif %}
+                                    <li class="collection-item avatar" id="{{ contact }}">
+                                        <img src="/static/img_avatar2.png" alt="" class="circle">
+                                        <span class="title">{{ contact }}</span>
+                                        <br>
+                                        <a href="#!" class="" onclick="send_click()"><i
+                                                class="material-icons">send</i></a>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -171,7 +198,8 @@
         </div>
     </div>
 </div>
-<div class="row hide-on-large-only hide-on-extra-large-only">
+
+<div class="row hide-on-large-only hide-on-extra-large-only" name="large_down_row">
     <ul class="collapsible col m8 offset-m2 s12">
         <li>
             <div class="collapsible-header"><i class="material-icons">search</i>Search for user</div>
@@ -224,46 +252,72 @@
                 </div>
             </div>
         </li>
+        <li>
+            <div class="collapsible-header"><i class="material-icons">contacts</i>Contact</div>
+            <div class="collapsible-body">
+                <div class="row">
+                    <div class="card">
+                        <div class="card-title  center-align cyan darken-2 white-text">Contact</div>
+                        <div class="card-content">
+                            <ul class="collapsible expandable">
+                                <li class="active">
+                                    <div class="collapsible-header"><i class="material-icons green-text text-darken-2">lens</i>Online
+                                    </div>
+                                    <div class="collapsible-body">
+                                        <ul class="collection" id="online_contact_list">
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="active">
+                                    <div class="collapsible-header"><i class="material-icons red-text text-darken-2">lens</i>Offline
+                                    </div>
+                                    <div class="collapsible-body">
+                                        <ul class="collection">
+                                            {% for contact in contacts %}
+                                                <li class="collection-item avatar" id="{{ contact }}">
+                                                    <img src="/static/img_avatar2.png" alt="" class="circle">
+                                                    <span class="title">{{ contact }}</span>
+                                                    <br>
+                                                    <a href="#!" class="" onclick="send_click()"><i
+                                                            class="material-icons">send</i></a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
     </ul>
-    <div class="col m8 offset-m2 hide-on-large-only s12 ">
+    <div class="col l3 hide-on-med-and-down">
         <div class="card">
             <div class="card-title  center-align cyan darken-2 white-text">Contact</div>
-            <div class="card-content med-and-down-contact-box">
+            <div class="card-content">
                 <ul class="collapsible expandable">
-                    <li>
+                    <li class="active">
                         <div class="collapsible-header"><i class="material-icons green-text text-darken-2">lens</i>Online
                         </div>
                         <div class="collapsible-body">
-                            <ul class="collection">
-                                {% for contact in contacts %}
-                                    {% if True %}
-                                        <li class="collection-item avatar">
-                                            <img src="/static/img_avatar2.png" alt="" class="circle">
-                                            <span class="title">username</span>
-                                            <p>email<br>loop.index</p>
-                                            <a href="#!" class="secondary-content" onclick="send_click()"><i
-                                                    class="material-icons">send</i></a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
+                            <ul class="collection" id="online_contact_list">
                             </ul>
                         </div>
                     </li>
-                    <li>
+                    <li class="active">
                         <div class="collapsible-header"><i class="material-icons red-text text-darken-2">lens</i>Offline
                         </div>
                         <div class="collapsible-body">
                             <ul class="collection">
                                 {% for contact in contacts %}
-                                    {% if False %}
-                                        <li class="collection-item avatar" onclick="send_click()">
-                                            <img src="/static/img_avatar2.png" alt="" class="circle">
-                                            <span class="title">{{ contact.user.username }}</span>
-                                            <p>{{ contact.user.email }}</p>
-                                            <a href="#!" class="secondary-content" onclick="send_click()"><i
-                                                    class="material-icons">send</i></a>
-                                        </li>
-                                    {% endif %}
+                                    <li class="collection-item avatar" id="{{ contact }}">
+                                        <img src="/static/img_avatar2.png" alt="" class="circle">
+                                        <span class="title">{{ contact }}</span>
+                                        <br>
+                                        <a href="#!" class="" onclick="send_click()"><i
+                                                class="material-icons">send</i></a>
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -272,7 +326,7 @@
             </div>
         </div>
     </div>
-    <div class="col m8 offset-m2 hide-on-large-only s12 " name="chatbox">
+    <div class="col m8 offset-m2 hide-on-large-only s12 hide" name="chatbox">
         <ul class="collection">
             <li class="collection-item avatar">
                 <img src="/static/img_avatar2.png" alt="" class="circle">
@@ -305,6 +359,8 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/static/js/materialize.js"></script>
 <script type="text/javascript" src="/static/js/ui_handler.js"></script>
+<script type="text/javascript" src="/static/js/webSocket_functions.js"></script>
+
 
 <!-- Compiled and minified JavaScript -->
 {#<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>#}
