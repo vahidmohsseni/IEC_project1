@@ -35,6 +35,7 @@ class ServerSentEvent(object):
 
 app = Flask(__name__)
 app.secret_key = SECRET
+
 subscriptions = []
 
 ServerRooms = {}
@@ -43,6 +44,7 @@ socket_io = SocketIO(app)
 sockets = Sockets(app)
 
 online_users = {}
+
 
 @app.route("/old_login")
 def test():
@@ -60,7 +62,7 @@ def home():
     rooms = transactions.get_rooms(session['username'])
 
     # rooms = []
-    return render_template("new_home.html", username=session['username'], rooms=rooms,contacts=contacts)
+    return render_template("new_home.html", username=session['username'], rooms=rooms, contacts=contacts)
 
 
 @app.route('/signup')
@@ -330,6 +332,7 @@ def test_sse_subscribe():
 
     return Response(gen(), mimetype="text/event-stream")
 
+
 @app.route("/websocket")
 def temp_api():
     return render_template('websocket_temp.html')
@@ -355,10 +358,10 @@ def on_connection():
         for con in contacts:
             if con in online_users:
                 temp.append(con)
-        
-        emit('on_con_resp', {'response': 'online_contacts', 
-                            'online_contacts': temp})
-        
+
+        emit('on_con_resp', {'response': 'online_contacts',
+                             'online_contacts': temp})
+
         # send a message to corresponding user's contacts
         for user in online_users:
             if session['username'] in online_users[user][2]:
@@ -368,7 +371,7 @@ def on_connection():
                         temp.append(con)
 
                 emit('on_con_resp', {'response': 'online_contacts',
-                                    'online_contacts': temp}, room=user)
+                                     'online_contacts': temp}, room=user)
 
     print('receive a connection')
 
@@ -387,7 +390,7 @@ def on_disconnection():
                     if con in online_users:
                         temp.append(con)
                 emit('on_con_resp', {'response': 'online_contacts',
-                                    'online_contacts': temp}, room=user)
+                                     'online_contacts': temp}, room=user)
 
         print("session: %s disconnected!" % session['username'])
     print('clinet disconnected')
@@ -400,8 +403,8 @@ def on_chat(message):
         message = message['message']
 
         emit('on_new_mess', {'response': 'new_message',
-                            'from': session['username'], 
-                            'message': message}, room=room)
+                             'from': session['username'],
+                             'message': message}, room=room)
 
 
 @sockets.route('/connect')
@@ -417,9 +420,7 @@ def echo_socket(ws):
         for con in contacts:
             if con in online_users:
                 temp.append(con)
-        
         ws.send(json.dumps({"status": "ok", 'online_users': temp}))
-
     while True:
         message = ws.receive()
         try:
@@ -427,24 +428,18 @@ def echo_socket(ws):
         except:
             print(message)
             continue
-            
-
-        
         msg_type = message["type"]
-
-
         if msg_type == 'echo':
-            ws.send(message['payload'])
+            ws.send(json.dumps(message))
 
         elif msg_type == 'chat':
             payload = message['payload']
             print(online_users)
             ws_temp = online_users.get(payload['user_id'], [1, 2, 3, False])[3]
-            if not ws_temp :
+            if not ws_temp:
                 ws.send("khaye karde")
             else:
                 ws_temp.send("madar vesal")
-        
         print(message)
 
 
@@ -469,8 +464,9 @@ def background_task():
 def run_server():
     app.debug = True
     from geventwebsocket.handler import WebSocketHandler
-    server = WSGIServer(("0.0.0.0", 5000), app,  handler_class=WebSocketHandler)
+    server = WSGIServer(("0.0.0.0", 5000), app, handler_class=WebSocketHandler)
     server.serve_forever()
+
 
 @werkzeug.serving.run_with_reloader
 def run_with_socketio():
