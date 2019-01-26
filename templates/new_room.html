@@ -8,7 +8,7 @@
 
         <body>
             <span>Room ID: </span>
-            <span>{{ room.id }}</span><br>
+            <span>{{ room }}</span><br>
             <span>share room id above with your firends to join!</span>
 
             <div id="event"></div>
@@ -17,7 +17,7 @@
             var eventOutputContainer = document.getElementById("event");
             // test
             // var evtSrc = new EventSource("/subscribe"); 
-            var evtSrc = new EventSource("/listen_to_room/{{ room.id }}");
+            var evtSrc = new EventSource("/listen_to_room/{{ room }}");
 
             evtSrc.onmessage = function(e) {
                 console.log(e.data);

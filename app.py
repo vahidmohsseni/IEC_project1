@@ -45,6 +45,10 @@ sockets = Sockets(app)
 
 online_users = {}
 
+signalling = {}
+
+user_socket_sig = {}
+
 
 @app.route("/old_login")
 def test():
@@ -210,8 +214,8 @@ def render_new_room(room_name):
     if 'username' not in session:
         return redirect(url_for('home'))
 
-    state, room = transactions.create_room(session['username'], room_name)
-    if state == 'ok':
+    room = room_name
+    if 'ok' == 'ok':
         return render_template('new_room.html', room=room)
     return 'failed'
 
@@ -224,10 +228,11 @@ def render_new_room_form():
     if 'room_name' not in request.form:
         return 'invalid input'
 
-    stat, room = transactions.create_room(
-        session['username'], request.form['room_name'])
-    if stat == 'ok':
-        return render_template('new_room.html', room=room)
+    room = request.form['room_name']
+    print(room)
+    if 'ok' == 'ok':
+        return render_template('webrtc_wait_callee.html', room=room)
+        # return render_template('new_room.html', room=room)
     return 'failed'
 
 
@@ -270,7 +275,8 @@ def join_room(room_id):
 
     gevent.spawn(notify)
 
-    room = transactions.get_room_by_id(room_id)
+    # room = transactions.get_room_by_id(room_id)
+    room = room_id
 
     return render_template('new_room.html', room=room)
 
@@ -295,11 +301,12 @@ def join_to_room():
             # print(msg)
             i.put(json.dumps(msg))
 
-    gevent.spawn(notify, room_id=request.form['room_id'])
+    # gevent.spawn(notify, room_id=request.form['room_id'])
 
-    room = transactions.get_room_by_id(request.form['room_id'])
-
-    return render_template('new_room.html', room=room)
+    # room = transactions.get_room_by_id(request.form['room_id'])
+    room = request.form['room_id']
+    return render_template("webrtc_join_caller.html", room=room)
+    # return render_template('new_room.html', room=room)
 
 
 @app.route("/test_sse_send")
@@ -421,6 +428,7 @@ def echo_socket(ws):
             if con in online_users:
                 temp.append(con)
         ws.send(json.dumps({"status": "ok", 'online_users': temp}))
+
     while True:
         message = ws.receive()
         try:
@@ -440,12 +448,76 @@ def echo_socket(ws):
                 ws.send("khaye karde")
             else:
                 ws_temp.send("madar vesal")
+
+        elif msg_type == "create_room":
+            room_name = message['payload']
+            ServerRooms[room_name] = {}
+
+            ws.send(json.dumps({"status": 'create_room'}))
+
+        elif msg_type == "join_room":
+            pass
         print(message)
+
+
+
+@sockets.route("/sigChan")
+def sigChan(ws):
+    if 'username' in session:
+        
+        signalling['test'] = signalling.get('test', [])
+        if session['username'] not in signalling['test']:
+            signalling['test'].append(session['username'])
+
+        user_socket_sig[session['username']] = ws
+        
+    while True:
+        msg = ws.receive()
+        ws.send(json.dumps({'data': "ddddd"}))
+
+        print(msg)
+        try:
+            msg = json.loads(msg)
+            room = msg.get('room', 0)
+            if not room:
+                print("eshtebaaaaah")
+            a = signalling.get(room)
+            print(signalling)
+            print(a)
+            for i in a:
+                if i != session['username']:
+                    print("to: ", i)
+                    user_socket_sig[i].send(json.dumps({"data": msg['data']}))
+                
+
+
+        except:
+            pass
+
+@app.route("/cr")
+def cr():
+    room = "test"
+
+    return render_template('video-chat-caller.html', room=room)
+
+
+
+@app.route("/jr")
+def jr():
+    room = "test"
+
+    return render_template('video-chat-callee.html', room=room)
+
 
 
 @app.route("/sockets")
 def render_sockets():
     return render_template('real_websocket.html')
+
+
+@app.route("/webrtc")
+def render_video():
+    return render_template("webrtc.html")
 
 
 def background_task():

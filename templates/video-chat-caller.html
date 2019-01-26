@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>video chat</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 col-md-5">
+            <video autoplay id="self-video" style="width: 30%"></video>
+        </div>
+        <div class="col-lg-6 col-md-5">
+            <video autoplay id="remote-video" style="width: 50%"></video>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var ws = new WebSocket("ws://" + document.location.hostname + ":" + location.port + "/sigChan");
+    ws.onopen = function () {
+        ws.send(JSON.stringify({type: "echo", payload: "hi!"}));
+    };
+
+    ws.onclose = function (evt) {
+        console.log("socket closed");
+    };
+
+    
+    function send_mess(data) {
+            ws.send(JSON.stringify({
+                'data': data,
+                'room': "{{ room }}"
+            }));
+        return false;
+    };
+    // const SignalingChannel = null;
+    // const SignalingChannel = function () {
+    //     this.send = function (data) {
+    //         $.ajax({
+    //             url: "/api/signaling/",
+    //             headers: {"X-CSRFToken": $.cookie("csrftoken"), 'Authorization': 'Token ' + $.cookie("userToken")},
+    //             data: {
+    //                 to: 'callee',
+    //                 room: window.location.pathname.split('/')[2],
+    //                 data: JSON.stringify(data)
+    //             },
+    //             type: "POST",
+    //             success: function (data, textStatus, jqXHR) {
+    //                 console.log('message sent');
+    //             },
+    //             error: function (jqXHR, textStatus, errorThrown) {
+    //                 console.log('signaling failed')
+    //             }
+    //         });
+
+
+    //     };
+
+    //     this.onmessage = function (message) {
+    //         console.log('message received!!! : ');
+    //         console.log(message);
+    //     };
+    // };
+
+    // const signaling = new SignalingChannel();
+    // signaling.send('this is some data containing in this place');
+
+    // $.ajax({
+    //     url: "/api/getUser/",
+    //     headers: {"X-CSRFToken": $.cookie("csrftoken"), 'Authorization': 'Token ' + $.cookie("userToken")},
+    //     type: "GET",
+    //     success: function (data, textStatus, jqXHR) {
+
+    //         var es = new EventSource('/events/?channel=' + data[0].email);
+    //         console.log('this is caller with email ' + data[0].email);
+
+    //         es.addEventListener('message', signaling.onmessage, false);
+
+    //         es.addEventListener('stream-reset', function (e) {
+    //             // ... client fell behind, reinitialize ...
+    //             console.log(e);
+    //         }, false);
+    //     },
+    //     error: function (jqXHR, textStatus, errorThrown) {
+    //         console.log('signaling failed')
+    //     }
+    // });
+
+    let remoteView = document.getElementById('remote-video');
+    let selfView = document.getElementById('self-video');
+    const constraints = {audio: true, video: true};
+    // const configuration = {iceServers: [{urls: 'stuns:stun.example.org'}]};
+    const configuration = {
+           iceServers: [
+            {
+                urls: "stun:stun.l.google.com:19302"
+            },
+            {
+                urls: "turn:turn.vahid.click:3478",
+                username: "ehsan",
+                credential: "TaaBeTaa"
+            }
+          ]
+        };
+
+    const pc = new RTCPeerConnection(configuration);
+
+    // send any ice candidates to the other peer
+    pc.onicecandidate = ({candidate}) => {
+        // if (pc.iceGatheringState == "complete")
+        send_mess({
+            candidate: candidate
+        });
+    };
+
+    // let the "negotiationneeded" event trigger offer generation
+    pc.onnegotiationneeded = async () => {
+        try {
+            await pc.setLocalDescription(await pc.createOffer());
+            // send the offer to the other peer
+            // signaling.send({desc: pc.localDescription});
+            send_mess({desc: pc.localDescription});
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // once remote track media arrives, show it in remote video element
+    pc.ontrack = (event) => {
+        // don't set srcObject again if it is already set.
+        if (remoteView.srcObject) return;
+        remoteView.srcObject = event.streams[0];
+    };
+
+    // call start() to initiate
+    async function start() {
+        try {
+            // get local stream, show it in self-view and add it to be sent
+            const stream =
+                await navigator.mediaDevices.getUserMedia({video: true});
+            stream.getTracks().forEach((track) =>
+                pc.addTrack(track, stream));
+            selfView.srcObject = stream;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // signaling.onmessage = async (message) => {
+    ws.onmessage = async (message) => {
+        console.log('in signaling onmessage');
+        // {desc, candidate};
+        // console.log(message);
+        let json = JSON.parse(message.data);
+        if (message.data == "null")
+            return;
+        // json = JSON.parse(json);
+        // console.log(json);
+        let desc = json.data.desc;
+        let candidate = json.data.candidate;
+        console.log(json);
+        // console.log('desc is ' + desc);
+        // console.log('candidate is ' + candidate);
+
+        try {
+            if (desc) {
+                // if we get an offer, we need to reply with an answer
+                if (desc.type == 'offer') {
+                    pc.setRemoteDescription(desc)
+                        .then(() => pc.createAnswer())
+                        .then(answer => pc.setLocalDescription(answer))
+                        .then(() => {
+                            // signaling.send({desc: pc.localDescription});
+                            send_mess({desc: pc.localDescription});
+                        })
+                        .catch(e => console.error(e));
+                } else if (desc.type == 'answer') {
+                    await pc.setRemoteDescription(desc);
+                } else {
+                    console.log('Unsupported SDP type. Your code may differ here.');
+                }
+            } else if (candidate) {
+                await pc.addIceCandidate(candidate);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+</script>
+</body>
+</html>

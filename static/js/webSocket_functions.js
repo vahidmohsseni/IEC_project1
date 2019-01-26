@@ -13,6 +13,20 @@ ws.onmessage = function (evt) {
         add_online_user(online_users);
         console.log(online_users);
     }
+    else if (msg.status === "sdp") {
+        on_sdp(msg.data);
+    }
+
+    else if (msg.status === "ice") {
+        on_ice(msg.data);
+    }
+
+    else if (msg.status === "create_room") {
+        create_room_callback();
+    }
+
+
+
     console.log(msg);
 };
 
@@ -24,4 +38,26 @@ function send_mess(event) {
         }
     }));
     return false;
+};
+
+function create_room(event) {
+    room_name = document.querySelector("#room_name").value;
+    ws.send(JSON.stringify({
+        type: "create_room",
+        payload: document.querySelector("#room_name").value
+    }))
+};
+
+
+function join_room(event) {
+    room_name = document.querySelector("#room_name").value;
+    ws.send(JSON.stringify({
+        type: "join_room",
+        payload: document.querySelector("#room_name").value
+    }))
+};
+
+
+function create_room_callback(){
+    console.log("!!!!!");
 };
