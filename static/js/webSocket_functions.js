@@ -1,4 +1,4 @@
-let ws = new WebSocket("ws://127.0.0.1:5000/connect");
+let ws = new WebSocket("ws://" + document.location.hostname + ":" + location.port + "/connect");
 ws.onopen = function () {
     ws.send(JSON.stringify({type: "echo", payload: "hi!"}));
 };
