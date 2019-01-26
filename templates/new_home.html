@@ -43,7 +43,7 @@
     </nav>
     <input id="user_id" value="salam" hidden>
 </div>
-<div class="row hide-on-med-and-down" name="large_row">
+<div class="row" name="large_row">
     <div class="col l8 m8 s12 offset-l2 offset-m2 hide" name="chatbox">
         <ul class="collection hide" name="collection_chatbox">
             <li class="collection-item avatar">
@@ -51,20 +51,20 @@
                 <span class="title" id="chatbox_title"></span>
                 <a href="#" onclick="close_click()"><i class="material-icons right">close</i></a>
             </li>
-            <li class="collection-item grey lighten-2">
+            <li class="collection-item grey lighten-2" id="chat_window">
                 <div class="chip cyan darken-2 white-text text">salam</div>
-                <br>
+                <br><br>
                 <div class="chip white cyan-text text-darken-2 right">salam</div>
-                <br>
+                <br><br>
             </li>
             <li class="collection-item ">
                 <div class="input-field col s12 m8 l8 xl8">
-                    <input type="text" name="msg">
+                    <input type="text" name="msg" id="message">
                     <label for="msg">type message</label>
                 </div>
                 <div class="input-field col s12 m4 l4 xl4">
                     <br>
-                    <button class='waves-effect waves-light btn-small s12' type="submit">Send</button>
+                    <button class='waves-effect waves-light btn-small s12' onclick="send_mess()">Send</button>
                 </div>
             </li>
         </ul>

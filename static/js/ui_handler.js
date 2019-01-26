@@ -34,3 +34,16 @@ function add_online_user(online_users) {
 
     })
 }
+
+function add_chat(chat, sender) {
+    let chat_window = document.querySelector("#chat_window");
+    let div = document.createElement("div");
+    if (sender === 1)
+        div.setAttribute("class", "chip cyan darken-2 white-text text");
+    else
+        div.setAttribute("class", "chip white cyan-text text-darken-2 right");
+    div.innerHTML = chat;
+    chat_window.appendChild(div);
+    chat_window.appendChild(document.createElement("br"));
+    chat_window.appendChild(document.createElement("br"));
+}

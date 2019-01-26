@@ -445,9 +445,9 @@ def echo_socket(ws):
             print(online_users)
             ws_temp = online_users.get(payload['user_id'], [1, 2, 3, False])[3]
             if not ws_temp:
-                ws.send("khaye karde")
+                ws.send(json.dumps({"status": "error", "payload": "Client Disconnect"}))
             else:
-                ws_temp.send("madar vesal")
+                ws_temp.send(json.dumps({"status": "chat", "payload": payload['message']}))
 
         elif msg_type == "create_room":
             room_name = message['payload']
@@ -460,17 +460,16 @@ def echo_socket(ws):
         print(message)
 
 
-
 @sockets.route("/sigChan")
 def sigChan(ws):
     if 'username' in session:
-        
+
         signalling['test'] = signalling.get('test', [])
         if session['username'] not in signalling['test']:
             signalling['test'].append(session['username'])
 
         user_socket_sig[session['username']] = ws
-        
+
     while True:
         msg = ws.receive()
         ws.send(json.dumps({'data': "ddddd"}))
@@ -488,11 +487,12 @@ def sigChan(ws):
                 if i != session['username']:
                     print("to: ", i)
                     user_socket_sig[i].send(json.dumps({"data": msg['data']}))
-                
+
 
 
         except:
             pass
+
 
 @app.route("/cr")
 def cr():
@@ -501,13 +501,11 @@ def cr():
     return render_template('video-chat-caller.html', room=room)
 
 
-
 @app.route("/jr")
 def jr():
     room = "test"
 
     return render_template('video-chat-callee.html', room=room)
-
 
 
 @app.route("/sockets")
